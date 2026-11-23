@@ -45,7 +45,7 @@ Common options:
 
 * `HF_TOKEN` if the model download requires authentication
 * `SERVED_MODEL_NAME=custom` is the default OpenAI-compatible model ID
-* `MAX_RUNNING_REQUESTS=8` and `MAX_QUEUED_REQUESTS=12` bound concurrency and queue depth
+* Set `MAX_RUNNING_REQUESTS` or `MAX_QUEUED_REQUESTS` in `.env` to override the corresponding SGLang default.
 * `ENABLE_DSPARK=0` selects plain decoding
 * `SPECULATIVE_NUM_DRAFT_TOKENS=8` — the verified DSpark draft-tokens per step
 * `CONTEXT_LENGTH=65536` to leave more room for the KV pool / concurrency
@@ -150,7 +150,7 @@ DSpark adds `--speculative-algorithm DSPARK --speculative-num-draft-tokens 8`.
 * `TP_SIZE=1`, `EP_SIZE=1`
 * `MEM_FRACTION_STATIC=0.45`
 * `CONTEXT_LENGTH` unset (model default) — set `65536` to trade context for KV
-* `ENABLE_DSPARK=1` (DSpark), 8 running requests and 12 queued by default
+* `ENABLE_DSPARK=1` (DSpark)
 
 ### H200 / GB300 (4 GPU)
 * `TP_SIZE=4`, `EP_SIZE=4`
