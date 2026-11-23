@@ -29,7 +29,7 @@ RUN if [ "${UPGRADE_SGLANG}" = "1" ]; then \
 # Verified cookbook recipe: TP1 / EP1, FA4 attention, BF16 GEMM, page 128,
 # mem-fraction-static 0.45. Override freely via .env.
 ENV MODEL_PATH="thinkingmachines/Inkling-2-Mini" \
-    SERVED_MODEL_NAME="inkling-2-mini" \
+    SERVED_MODEL_NAME="custom" \
     TP_SIZE="1" \
     EP_SIZE="1" \
     MEM_FRACTION_STATIC="0.45" \
@@ -39,13 +39,13 @@ ENV MODEL_PATH="thinkingmachines/Inkling-2-Mini" \
     BF16_GEMM_BACKEND="" \
     DTYPE="bfloat16" \
     GRAMMAR_BACKEND="xgrammar" \
-    MAX_RUNNING_REQUESTS="" \
-    MAX_QUEUED_REQUESTS="" \
+    MAX_RUNNING_REQUESTS="8" \
+    MAX_QUEUED_REQUESTS="12" \
     HTTP_PORT="30000" \
     ENABLE_MULTIMODAL="1" \
     ENABLE_TOOLS="1" \
     ENABLE_REASONING="1" \
-    ENABLE_DSPARK="0" \
+    ENABLE_DSPARK="1" \
     SPECULATIVE_NUM_DRAFT_TOKENS="8" \
     INKLING2_LOOP_NUM_PASSES="" \
     INKLING2_LOOP_SHARE_CACHE="0" \
