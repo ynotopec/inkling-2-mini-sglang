@@ -44,12 +44,20 @@ ARGS=(
 [[ "${INKLING2_LOOP_SHARE_CACHE:-0}" == "1" ]] && ARGS+=( --inkling2-loop-share-cache )
 
 # DSpark speculative decoding on the bundled MTP draft head.
-if [[ "${ENABLE_DSPARK:-0}" == "1" ]]; then
+if [[ "${ENABLE_DSPARK:-1}" == "1" ]]; then
+  export SGLANG_OPT_INKLING2_VERIFY_REL_BIAS_KERNEL="${SGLANG_OPT_INKLING2_VERIFY_REL_BIAS_KERNEL:-1}"
+  export SGLANG_OPT_DSV41_DSPARK_MID_FOLD="${SGLANG_OPT_DSV41_DSPARK_MID_FOLD:-1}"
+  export SGLANG_OPT_DSV41_DSPARK_PREPARE_INPUTS_ONCE="${SGLANG_OPT_DSV41_DSPARK_PREPARE_INPUTS_ONCE:-1}"
+  export SGLANG_OPT_DSV41_DSPARK_SKIP_PREFILLED_INPUTS="${SGLANG_OPT_DSV41_DSPARK_SKIP_PREFILLED_INPUTS:-1}"
   ARGS+=(
     --speculative-algorithm DSPARK
     --speculative-num-draft-tokens "${SPECULATIVE_NUM_DRAFT_TOKENS:-8}"
   )
 fi
+
+echo "Launching SGLang:"
+printf ' %q' "${ARGS[@]}"
+echo
 
 if [[ -n "${API_KEY:-}" ]]; then
   ARGS+=( --api-key "${API_KEY}" )
@@ -57,10 +65,6 @@ fi
 if [[ -n "${ADMIN_API_KEY:-}" ]]; then
   ARGS+=( --admin-api-key "${ADMIN_API_KEY}" )
 fi
-
-echo "Launching SGLang:"
-printf ' %q' "${ARGS[@]}"
-echo
 
 health_url="http://127.0.0.1:${HTTP_PORT}/health"
 monitor_interval="${HEALTHCHECK_MONITOR_INTERVAL:-15}"

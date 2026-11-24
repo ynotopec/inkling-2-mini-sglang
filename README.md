@@ -44,7 +44,9 @@ API_KEY=change-me
 Common options:
 
 * `HF_TOKEN` if the model download requires authentication
-* `ENABLE_DSPARK=1` to enable speculative decoding on the bundled MTP draft head
+* `SERVED_MODEL_NAME=custom` is the default OpenAI-compatible model ID
+* Set `MAX_RUNNING_REQUESTS` or `MAX_QUEUED_REQUESTS` in `.env` to override the corresponding SGLang default.
+* `ENABLE_DSPARK=0` selects plain decoding
 * `SPECULATIVE_NUM_DRAFT_TOKENS=8` — the verified DSpark draft-tokens per step
 * `CONTEXT_LENGTH=65536` to leave more room for the KV pool / concurrency
   (unset = model default 1,048,576)
@@ -79,7 +81,7 @@ curl http://127.0.0.1:30000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ***" \
   -d '{
-    "model": "inkling-2-mini",
+    "model": "custom",
     "messages": [
       {"role": "user", "content": "Bonjour"}
     ]
@@ -93,7 +95,7 @@ curl http://127.0.0.1:30000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ***" \
   -d '{
-    "model": "inkling-2-mini",
+    "model": "custom",
     "messages": [
       {"role": "user", "content": [
         {"type": "text", "text": "Describe this image."},
@@ -105,16 +107,13 @@ curl http://127.0.0.1:30000/v1/chat/completions \
 
 ## Two strategies
 
-### Balanced (default, `ENABLE_DSPARK=0`)
+### Balanced (`ENABLE_DSPARK=0`)
 Plain decode. Verified on DGX Spark at **93.56 %** on GSM8K (sgl-eval, 1319
 questions, temperature 0).
 
-### DSpark (`ENABLE_DSPARK=1`)
+### DSpark (default, `ENABLE_DSPARK=1`)
 Speculative decoding on the bundled MTP draft head, 8 draft tokens per step.
-Verified on DGX Spark at **93.93 %** on the same GSM8K run. The four
-`SGLANG_OPT_*` speculative optimizations the cookbook enables for the
-single-GPU DSpark recipes are baked into the base image profile; set them in
-`.env` if you rebuild from a base that lacks them:
+Verified on DGX Spark at **93.93 %** on the same GSM8K run. The launcher applies these cookbook settings when DSpark is active. Each can be overridden in `.env`:
 
 ```
 SGLANG_OPT_INKLING2_VERIFY_REL_BIAS_KERNEL=1
@@ -125,7 +124,7 @@ SGLANG_OPT_DSV41_DSPARK_SKIP_PREFILLED_INPUTS=1
 
 ## Verified DGX Spark recipe (source: SGLang cookbook)
 
-The defaults encode the `hw=dgx-spark & quant=nvfp4 & strategy=balanced` cell:
+The cookbook Balanced command below is the baseline for both strategies:
 
 ```
 MAX_JOBS=4
@@ -151,7 +150,7 @@ DSpark adds `--speculative-algorithm DSPARK --speculative-num-draft-tokens 8`.
 * `TP_SIZE=1`, `EP_SIZE=1`
 * `MEM_FRACTION_STATIC=0.45`
 * `CONTEXT_LENGTH` unset (model default) — set `65536` to trade context for KV
-* `ENABLE_DSPARK=0` (Balanced) or `1` (DSpark)
+* `ENABLE_DSPARK=1` (DSpark)
 
 ### H200 / GB300 (4 GPU)
 * `TP_SIZE=4`, `EP_SIZE=4`
